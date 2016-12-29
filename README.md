@@ -1,7 +1,7 @@
 # Flickrphotos
 ----------------------
 
-X is a simple REST application to demonstrate the use of geolocation, with Flickr and Google maps.
+Flickrphotos is a simple REST application to demonstrate the use of geolocation, with Flickr and Google maps.
 
 Add flickr API KEY, secrect key and GMAP KEY on aplication.properties
 
@@ -20,7 +20,7 @@ GMAP_API_KEY = AIza......
 
  [http://localhost:8080/geolocation](http://localhost:8080/geolocation)
  
- http://localhost:8080/geolocation/{id}   id= flickr_id_photo
+ http://localhost:8080/geolocation/{id}?page=1   id= flickr_id_photo
 
  *Libraries used*
  
