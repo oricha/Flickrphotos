@@ -8,8 +8,12 @@ import javax.ws.rs.Produces;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.flickr4java.flickr.Flickr;
@@ -22,6 +26,7 @@ import com.google.maps.GeocodingApi;
 import com.google.maps.model.GeocodingResult;
 import com.google.maps.model.LatLng;
 
+@Controller
 @RestController
 public class GeolocationController {
 
@@ -37,18 +42,22 @@ public class GeolocationController {
 
 	@Value("${geo.photoid}")
 	private String photoId;
+
+	private int SIZE = 5;
+	private int PAGE = 0;
+
 	/**
-	 *  The id parameter is the id_photo, If it is null, a default photo is used
+	 * The id parameter is the id_photo, If it is null, a default photo is used
 	 * 
 	 */
-	@RequestMapping("/geolocation/{id}")
+	@RequestMapping(value = "/geolocation/{idP}", method = RequestMethod.GET)
 	@Produces("application/json")
-	public List<GeocodingResult> geolocation(@PathVariable String id)
-			throws FlickrException {
+	public @ResponseBody List<GeocodingResult> geolocation(@PathVariable String idP,
+			@RequestParam(required = false, defaultValue = "0") Integer page) throws FlickrException {
+
 		List<GeocodingResult> result = new ArrayList<>();
-		
-		photoId = (id == null) ? photoId: id;  //Mock id_photo, is optional
-		
+		photoId = (idP == null) ? photoId : idP; // Mock id_photo, is optional
+		PAGE = page;
 		Flickr flickr = new Flickr(APIKEY, SHAREDSECRET, new REST());
 		GeoInterface geo = flickr.getPhotosInterface().getGeoInterface();
 		GeoData locData;
@@ -64,13 +73,22 @@ public class GeolocationController {
 		try {
 			results = GeocodingApi.newRequest(context).latlng(new LatLng(locData.getLatitude(), locData.getLongitude()))
 					.await();
-			for (GeocodingResult item : results) {
-				result.add(item);
+			if (PAGE >= getTotalPages(results)) {
+				throw new Exception("Error with pagination");
+			}
+			int ini = (PAGE == 0) ? 0 : SIZE * PAGE - 1;
+			int end = (ini + SIZE <= results.length) ? ini + SIZE : results.length;
+			for (int i = ini; i < end; i++) {
+				result.add(results[i]);
 			}
 		} catch (Exception e) {
 			LOG.error("Error locating photo", e.getMessage());
 		}
 		return result;
+	}
+
+	private int getTotalPages(GeocodingResult[] a) {
+		return a.length == 0 ? 1 : (int) Math.ceil((double) a.length / (double) SIZE);
 	}
 
 }
