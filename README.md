@@ -20,7 +20,7 @@ GMAP_API_KEY = AIza......
 
  [http://localhost:8080/geolocation](http://localhost:8080/geolocation)
  
- http://localhost:8080/geolocation/{id}?page=1   id= flickr_id_photo
+ [http://localhost:8080/geolocation/{id}?page=1](http://localhost:8080/geolocation/{id}?page=1)  id= flickr_id_photo
 
  *Libraries used*
  

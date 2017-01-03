@@ -43,7 +43,9 @@ public class GeolocationController {
 	@Value("${geo.photoid}")
 	private String photoId;
 
-	private int SIZE = 5;
+	@Value("${geo.pagesize}")
+	private int SIZE;
+	
 	private int PAGE = 0;
 
 	/**
@@ -76,7 +78,7 @@ public class GeolocationController {
 			if (PAGE >= getTotalPages(results)) {
 				throw new Exception("Error with pagination");
 			}
-			int ini = (PAGE == 0) ? 0 : SIZE * PAGE - 1;
+			int ini = (PAGE == 0) ? 0 : SIZE * PAGE;
 			int end = (ini + SIZE <= results.length) ? ini + SIZE : results.length;
 			for (int i = ini; i < end; i++) {
 				result.add(results[i]);
